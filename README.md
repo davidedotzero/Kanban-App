@@ -1,36 +1,128 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# สรุปขั้นตอนการสร้าง Kanban Task Management App (Next.js, Next-Auth, Firebase)
 
-## Getting Started
+เอกสารนี้สรุปขั้นตอนการพัฒนาและแก้ไขปัญหาที่พบระหว่างการสร้างโปรเจกต์ Kanban App ตามบทช่วยสอน โดยเน้นที่การตั้งค่าโปรเจกต์เริ่มต้นและการติดตั้งระบบยืนยันตัวตนด้วย `next-auth.js`
 
-First, run the development server:
+## 1. การตั้งค่าโปรเจกต์เริ่มต้น (Initial Project Setup)
+
+### 1.1. สร้างโปรเจกต์ Next.js
+ใช้คำสั่ง `create-next-app` เพื่อสร้างโปรเจกต์ใหม่ พร้อมเปิดใช้งาน TypeScript และ Tailwind CSS
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx create-next-app@latest kanban-app-tutorial
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 1.2. ทำความสะอาดโปรเจกต์
+- **ลบเนื้อหาในไฟล์ `app/page.tsx`** และใส่โค้ดชั่วคราว:
+  ```tsx
+  export default function Home() {
+    return (
+      <main>
+        <p>Hi</p>
+      </main>
+    )
+  }
+  ```
+- **แก้ไขไฟล์ `app/globals.css`** โดยเหลือไว้เฉพาะส่วนที่ import Tailwind CSS เท่านั้น
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 2. การติดตั้งและตั้งค่า Next-Auth
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2.1. ติดตั้ง Library
+```bash
+npm install next-auth
+```
 
-## Learn More
+### 2.2. สร้างโครงสร้างไฟล์สำหรับ API Route
+สร้างไฟล์และโฟลเดอร์ตามโครงสร้างต่อไปนี้:
+```
+app/
+└── api/
+    └── auth/
+        └── [...nextauth]/
+            ├── options.ts
+            └── route.ts
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 2.3. ตั้งค่า `options.ts`
+ไฟล์นี้ใช้สำหรับกำหนดค่า provider ที่จะใช้ (ในที่นี้คือ Google)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```typescript
+// app/api/auth/[...nextauth]/options.ts
+import type { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+export const options: NextAuthOptions = {
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    }),
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+};
+```
 
-## Deploy on Vercel
+### 2.4. ตั้งค่า `route.ts`
+ไฟล์นี้ทำหน้าที่รับ request `GET` และ `POST` ที่เข้ามายัง API route ของ `next-auth`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```typescript
+// app/api/auth/[...nextauth]/route.ts
+import NextAuth from "next-auth/next";
+import { options } from "./options";
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+const handler = NextAuth(options);
+
+export { handler as GET, handler as POST };
+```
+
+### 2.5. ตั้งค่า Environment Variables (`.env.local`)
+สร้างไฟล์ `.env.local` ที่ **root** ของโปรเจกต์เพื่อเก็บค่า credentials และ secret key
+- `GOOGLE_CLIENT_ID` และ `GOOGLE_CLIENT_SECRET` สามารถขอได้จาก [Google Cloud Console](https://console.cloud.google.com/)
+- `NEXTAUTH_SECRET` สร้างได้ด้วยคำสั่ง:
+  ```bash
+  openssl rand -base64 32
+  ```
+- `NEXTAUTH_URL` สำหรับการพัฒนาคือ `http://localhost:3000`
+
+**ตัวอย่างไฟล์ `.env.local`:**
+```env
+GOOGLE_CLIENT_ID=<your-client-id>
+GOOGLE_CLIENT_SECRET=<your-client-secret>
+NEXTAUTH_SECRET=<your-generated-secret>
+NEXTAUTH_URL=http://localhost:3000
+```
+
+### 2.6. สร้าง Middleware เพื่อป้องกัน Route
+สร้างไฟล์ `middleware.ts` ที่ **root** ของโปรเจกต์ เพื่อบังคับให้ผู้ใช้ต้องล็อกอินก่อนเข้าถึงหน้าแรก (`/`)
+
+```typescript
+// middleware.ts
+export { default } from 'next-auth/middleware'
+
+export const config = { matcher: ['/'] }
+```
+
+---
+
+## 3. การแก้ปัญหา `Configuration 500 Error`
+
+หลังจากตั้งค่าเสร็จสิ้น พบข้อผิดพลาด `GET /api/auth/error?error=Configuration 500` ซึ่งบ่งชี้ว่าการตั้งค่า `next-auth` มีปัญหา ได้ดำเนินการแก้ไขตามขั้นตอนดังนี้:
+
+### 3.1. ตรวจสอบและแก้ไขโค้ด
+- **แก้ไข `options.ts`:** property `secret` ต้องใช้ `process.env.NEXTAUTH_SECRET` ไม่ใช่ `NEXTAUTH_URL`
+- **ตรวจสอบ `.env.local`:**
+  - ไฟล์ต้องอยู่ที่ root ของโปรเจกต์
+  - ชื่อตัวแปรถูกต้อง ไม่มีการพิมพ์ผิด
+  - **ต้อง Restart Server (`npm run dev`) ทุกครั้งหลังแก้ไขไฟล์**
+
+### 3.2. ตรวจสอบการโหลด Environment Variables
+ใช้ `console.log` ในไฟล์ `options.ts` เพื่อยืนยันว่าโปรแกรมสามารถอ่านค่าจาก `.env.local` ได้จริง ผลการตรวจสอบพบว่า **โปรแกรมอ่านค่าได้ปกติ**
+
+### 3.3. ตรวจสอบการตั้งค่าฝั่ง Google Cloud (ขั้นตอนล่าสุด)
+เมื่อยืนยันว่าโปรแกรมอ่านค่า env ได้ ปัญหาจึงน่าจะเกิดจากการตั้งค่าฝั่ง Google ที่ไม่ถูกต้อง
+- **Authorized redirect URIs:**
+  - ในหน้า Credentials ของ Google Cloud Console
+  - ต้องเพิ่ม `http://localhost:3000/api/auth/callback/google` เข้าไป
+- **OAuth Consent Screen:**
+  - หากสถานะเป็น `Testing` จะต้องเพิ่มอีเมลผู้ใช้ทดสอบในแท็บ `Test users`
+
+**สถานะปัจจุบัน:** กำลังตรวจสอบความถูกต้องของการตั้งค่าใน Google Cloud Console เนื่องจากเป็นสาเหตุที่มีความเป็นไปได้สูงสุดที่เหลืออยู่
