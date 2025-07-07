@@ -30,17 +30,17 @@
 ## 4. การตั้งค่า Redux Store
 
 - **ติดตั้ง Library** ด้วยคำสั่ง `npm install @reduxjs/toolkit react-redux`
-- **สร้างโครงสร้างไฟล์สำหรับ Redux** ภายในโฟลเดอร์ `src/redux/` (`store.ts`, `hooks.ts`, `provider.tsx`)
+- **สร้างโครงสร้างไฟล์สำหรับ Redux** ภายในโฟลเดอร์ `src/redux/` (`store.ts`, `hooks.ts`, `provider.tsx`, `rootReducer.ts`)
 - **นำ Provider ไปใช้งาน** โดยการครอบ `children` ในไฟล์ `app/layout.tsx`
-- **แก้ปัญหา Redux Initialization** โดยการสร้าง `placeholderSlice.ts` ชั่วคราว
+- **แก้ปัญหา Redux Initialization** โดยการสร้าง `placeholderSlice.ts` ชั่วคราว และเพิ่ม `appSlice` เข้าไปใน `rootReducer`
 
 ---
 
-## 5. การแก้ปัญหา TypeScript: Cannot find module
+## 5. การตั้งค่า RTK Query และ API Slice
 
-- **ปัญหา:** พบข้อผิดพลาด `Cannot find module '@/...'`
-- **สาเหตุ:** TypeScript ไม่รู้จัก "Path Alias" `@/`
-- **การแก้ไข:** อัปเดตไฟล์ `tsconfig.json` โดยเพิ่มการตั้งค่า `baseUrl` และ `paths`
+- **สร้าง API Slice** ที่ `src/redux/services/apiSlice.ts` โดยใช้ `createApi` และ `fakeBaseQuery` เพื่อกำหนด endpoint สำหรับดึงข้อมูลจาก Firestore
+- **รวม Reducer** โดยใช้ `combineReducers` ใน `rootReducer.ts`
+- **อัปเดต `store.ts`** ให้มี `middleware` ของ RTK Query และเปิดใช้งาน `setupListeners`
 
 ---
 
@@ -52,33 +52,22 @@
 
 ---
 
-## 7. การตั้งค่า Firebase Firestore
+## 7. การเชื่อมต่อ Firebase และการจัดการข้อมูลเบื้องต้น
 
-- **สร้างโปรเจกต์** บน [Firebase console](https://console.firebase.google.com/)
-- **ติดตั้ง Library** ด้วยคำสั่ง `npm install firebase`
-- **สร้างไฟล์ Configuration** ที่ `utils/firebaseConfig.ts`
+- **ตั้งค่า Firebase Firestore** โดยสร้างโปรเจกต์, ติดตั้ง `firebase`, และสร้างไฟล์ `firebaseConfig.ts`
 - **แก้ไขกฎ (Rules)** ของ Firestore เป็น `allow read, write: if true;` สำหรับการพัฒนา
+- **เพิ่มข้อมูลเริ่มต้นให้ผู้ใช้ใหม่** โดยใช้ `getSession` และ `addDoc` ใน `page.tsx` เพื่อสร้าง document เริ่มต้นให้ใน Firestore
+- **แก้ปัญหาการเชื่อมต่อ** ที่เกิดจาก `firebaseConfig` ว่าง และ Type ที่ไม่ถูกต้องใน `page.tsx`
 
 ---
 
-## 8. การเพิ่มข้อมูลเริ่มต้นให้ผู้ใช้ใหม่
+## 8. การนำข้อมูลมาแสดงผล (Data Population)
 
-- **สร้างไฟล์ `data.js`** ที่ `utils/` เพื่อเก็บข้อมูลจำลอง (Dummy Data)
-- **แก้ไข `page.tsx`**:
-  - ใช้ `getSession` เพื่อดึงข้อมูลผู้ใช้ที่ล็อกอิน
-  - ใช้ `useEffect` เพื่อตรวจสอบว่าผู้ใช้มีข้อมูลใน Firestore แล้วหรือยัง
-  - หากเป็นผู้ใช้ใหม่ ให้ใช้ `addDoc` เพื่อสร้าง document เริ่มต้นให้ใน Firestore ภายใต้ path `users/{userEmail}/tasks`
+- **Navbar**: อัปเดต `Navbar.tsx` ให้ใช้ `useFetchDataFromDbQuery` เพื่อดึงข้อมูล และ `useEffect` เพื่อ dispatch action (`setPageTitle`) ไปยัง Redux store เพื่อแสดงชื่อบอร์ดปัจจุบัน
+- **Sidebar**: อัปเดต `Sidebar.tsx` ให้ดึงข้อมูลบอร์ดทั้งหมดมาแสดงเป็นรายการ และจัดการ state ของบอร์ดที่กำลัง active เพื่อเปลี่ยน UI และ dispatch action เมื่อผู้ใช้คลิกสลับบอร์ด
+- **BoardTasks**:
+    - ติดตั้ง `react-icons` สำหรับไอคอน
+    - อัปเดต `BoardTasks.tsx` ให้ดึงข้อมูลทั้งหมด และใช้ `useEffect` ร่วมกับ `useAppSelector` เพื่อกรองหาข้อมูลเฉพาะของบอร์ดที่กำลัง active อยู่
+    - นำข้อมูลคอลัมน์และ Task มาแสดงผล พร้อมจัดการ UI สำหรับบอร์ด/คอลัมน์ที่ว่าง และปุ่มสำหรับเพิ่มคอลัมน์ใหม่
 
----
-
-## 9. การแก้ปัญหา (ช่วงเชื่อมต่อข้อมูล)
-
-- **ปัญหา TypeScript:** พบ Error เกี่ยวกับ `void`, `never`, และการใช้ `getDocs`
-- **การแก้ไข:**
-  1.  **เปลี่ยนชื่อตัวแปร:** แก้ไขการตั้งชื่อตัวแปรที่ซ้ำกับฟังก์ชัน `getDocs` ที่ import มา
-  2.  **เพิ่ม Type Safety:** Import `Session` type จาก `next-auth` มาใช้กำหนดประเภทของ State ให้ชัดเจนขึ้น เพื่อแก้ปัญหาการอนุมาน Type ที่ผิดพลาด
-- **ปัญหา Firebase:** พบ Error `FirebaseError: "projectId" not provided`
-- **การแก้ไข:**
-  - **เติม `firebaseConfig`:** คัดลอกค่า Config ทั้งหมดจาก Firebase Console มาวางในอ็อบเจกต์ `firebaseConfig` ในไฟล์ `utils/firebaseConfig.ts`
-
-**สถานะปัจจุบัน:** แอปพลิเคชันสามารถสร้างข้อมูลเริ่มต้นสำหรับผู้ใช้ใหม่ใน Firestore ได้อย่างถูกต้อง พร้อมสำหรับขั้นตอนถัดไป คือการดึงข้อมูลจาก Firestore มาใช้งานด้วย RTK Query
+**สถานะปัจจุบัน:** แอปพลิเคชันสามารถ **"อ่าน" (Read)** และแสดงผลข้อมูลจาก Firestore ได้อย่างสมบูรณ์แล้ว พร้อมสำหรับขั้นตอนถัดไปคือการทำ **CRUD Operations (Create, Update, Delete)**

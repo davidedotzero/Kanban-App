@@ -40,7 +40,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    getSession();
+    getUserSession();
   }, []);
 
   useEffect(() => {

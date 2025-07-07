@@ -2,14 +2,18 @@
 
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
-import placeholderReducer from './features/placeholderSlice';
+
+import { fireStoreApi } from './services/apiSlice';
+import { rootReducer } from './rootReducer';
 
 // Redux Store
 export const store = configureStore({
-  reducer: {
-    placeholder: placeholderReducer
-  },
+  reducer: rootReducer,
+  // เพิ่ม middleware ของ RTK Query เข้าไป
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(fireStoreApi.middleware),
 });
+
 
 setupListeners(store.dispatch);
 
