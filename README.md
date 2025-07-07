@@ -126,3 +126,33 @@ export const config = { matcher: ['/'] }
   - หากสถานะเป็น `Testing` จะต้องเพิ่มอีเมลผู้ใช้ทดสอบในแท็บ `Test users`
 
 **สถานะปัจจุบัน:** กำลังตรวจสอบความถูกต้องของการตั้งค่าใน Google Cloud Console เนื่องจากเป็นสาเหตุที่มีความเป็นไปได้สูงสุดที่เหลืออยู่
+
+### 4. การตั้งค่า Redux Store
+
+- **ติดตั้ง Library** ด้วยคำสั่ง `npm install @reduxjs/toolkit react-redux`
+- **สร้างโครงสร้างไฟล์สำหรับ Redux** ภายในโฟลเดอร์ `src/redux/`:
+    - `store.ts`: ใช้ `configureStore` เพื่อสร้าง Redux store หลัก
+    - `hooks.ts`: สร้าง `useAppDispatch` และ `useAppSelector` ที่เป็น Typed-version เพื่อความปลอดภัยของข้อมูล
+    - `provider.tsx`: สร้าง Custom Provider (`<Providers>`) เพื่อครอบแอปพลิเคชัน
+- **นำ Provider ไปใช้งาน** โดยการ import `Providers` มาครอบ `children` ในไฟล์ `app/layout.tsx` เพื่อให้ทุก Component เข้าถึง Store ได้
+
+---
+
+### 5. การแก้ปัญหา TypeScript: Cannot find module
+
+- **ปัญหา:** พบข้อผิดพลาด `Cannot find module '@/redux/provider'` ในไฟล์ `layout.tsx`
+- **สาเหตุ:** TypeScript ไม่รู้จัก "Path Alias" หรือชื่อย่อ `@/`
+- **การแก้ไข:**
+    - **อัปเดตไฟล์ `tsconfig.json`** โดยเพิ่มการตั้งค่า `baseUrl` และ `paths` ภายใน `compilerOptions` เพื่อบอกให้ TypeScript รู้ว่า `@/` หมายถึงโฟลเดอร์ `src/`
+
+      ```json
+      "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+          "@/*": ["./src/*"]
+        }
+      }
+      ```
+    - **Restart** โปรแกรมแก้ไขโค้ด หรือ TypeScript Server เพื่อให้โหลดการตั้งค่าใหม่
+
+**สถานะปัจจุบัน:** ระบบยืนยันตัวตนด้วย Next-Auth และโครงสร้างของ Redux Store ได้รับการตั้งค่าและแก้ไขปัญหาเบื้องต้นเรียบร้อยแล้ว พร้อมสำหรับขั้นตอนถัดไปในการสร้างหน้าตาของแอปพลิเคชัน (Markup)
