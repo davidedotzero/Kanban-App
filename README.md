@@ -127,7 +127,7 @@ export const config = { matcher: ['/'] }
 
 **สถานะปัจจุบัน:** กำลังตรวจสอบความถูกต้องของการตั้งค่าใน Google Cloud Console เนื่องจากเป็นสาเหตุที่มีความเป็นไปได้สูงสุดที่เหลืออยู่
 
-### 4. การตั้งค่า Redux Store
+## 4. การตั้งค่า Redux Store
 
 - **ติดตั้ง Library** ด้วยคำสั่ง `npm install @reduxjs/toolkit react-redux`
 - **สร้างโครงสร้างไฟล์สำหรับ Redux** ภายในโฟลเดอร์ `src/redux/`:
@@ -138,7 +138,7 @@ export const config = { matcher: ['/'] }
 
 ---
 
-### 5. การแก้ปัญหา TypeScript: Cannot find module
+## 5. การแก้ปัญหา TypeScript: Cannot find module
 
 - **ปัญหา:** พบข้อผิดพลาด `Cannot find module '@/redux/provider'` ในไฟล์ `layout.tsx`
 - **สาเหตุ:** TypeScript ไม่รู้จัก "Path Alias" หรือชื่อย่อ `@/`
