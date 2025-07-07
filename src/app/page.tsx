@@ -1,7 +1,12 @@
+// src/app/page.tsx
+import Sidebar from "./components/Sidebar";
+import BoardTasks from "./components/BoardTasks";
+
 export default function Home() {
   return (
-    <main>
-      <p>Hi</p>
+    <main className="flex h-full">
+      <Sidebar />
+      <BoardTasks />
     </main>
-  )
+  );
 }
