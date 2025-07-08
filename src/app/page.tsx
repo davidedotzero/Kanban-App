@@ -12,6 +12,8 @@ import { type Session } from "next-auth";
 
 import { data } from "../utils/data";
 
+import AddAndEditBoardModal from "./components/AddAndEditBoardModal";
+
 export default function Home() {
   const [ userDetails, setUserDetails ] = useState<Session["user"] | null>(null);
 
@@ -51,6 +53,7 @@ export default function Home() {
     <main className="flex h-full">
       <Sidebar />
       <BoardTasks />
+      <AddAndEditBoardModal />
     </main>
   );
 }

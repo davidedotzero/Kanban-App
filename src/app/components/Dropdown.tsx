@@ -1,10 +1,13 @@
 //src/app/components/Dropdown.tsx
+import { useAppDispatch } from '@/redux/hooks';
+import { openAddAndEditBoardModal } from '@/redux/features/appSlice';
 
 interface IDropdown {
   show: boolean
 }
 
 export default function Dropdown({ show }: IDropdown) {
+  const dispatch = useAppDispatch();
 
   return (
     <div
@@ -14,7 +17,9 @@ export default function Dropdown({ show }: IDropdown) {
        border shadow-lg right-0 py-2 rounded-2xl`}
     >
       <div className="hover:bg-gray-300">
-        <button className="text-sm px-4 py-2">Edit Board</button>
+        <button 
+        onClick={() => dispatch(openAddAndEditBoardModal("Edit Board"))}
+        className="text-sm px-4 py-2">Edit Board</button>
       </div>
       <div className="hover:bg-gray-300">
         <button className="text-sm px-4 py-2">

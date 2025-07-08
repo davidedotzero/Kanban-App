@@ -5,6 +5,10 @@ import { useAppSelector } from "@/redux/hooks";
 import { getPageTitle } from "@/redux/features/appSlice";
 import { MdEdit, MdDelete } from "react-icons/md";
 
+import { openAddAndEditBoardModal } from '@/redux/features/appSlice';
+import { useAppDispatch } from '@/redux/hooks';
+
+
 interface ITask {
   id: string;
   title: string;
@@ -22,6 +26,7 @@ export default function BoardTasks() {
   const { isLoading, data } = useFetchDataFromDbQuery();
   const [columns, setColumns] = useState<Column[]>([]);
   const currentBoardName = useAppSelector(getPageTitle);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (data !== undefined && data.length > 0) {
@@ -82,7 +87,9 @@ export default function BoardTasks() {
               })}
               {/* ถ้าจำนวนคอลัมน์ของ task น้อยกว่า 7, ให้แสดงตัวเลือกเพื่อเพิ่มคอลัมน์ */}
               {columns.length < 7 && (
-                <div className="rounded-md bg-white w-[17.5rem] mt-12 shrink-0 flex justify-center items-center">
+                <div 
+                onClick={() => dispatch(openAddAndEditBoardModal("Edit"))}
+                className="rounded-md bg-white w-[17.5rem] mt-12 shrink-0 flex justify-center items-center">
                   <p className="cursor-pointer font-bold text-black text-2xl">
                     + New Column
                   </p>

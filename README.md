@@ -86,3 +86,30 @@
 
 **สถานะปัจจุบัน:** แอปพลิเคชันพร้อมที่จะทำ **CRUD Operations** แล้ว โดยมีทั้ง endpoint สำหรับ **"อ่าน" (Query)** และ **"เขียน" (Mutation)** ข้อมูลเรียบร้อยแล้ว ขั้นตอนต่อไปคือการสร้าง UI และ Logic สำหรับการเพิ่ม, แก้ไข, และลบข้อมูลบอร์ดและ Task
 
+## 10. การสร้าง Modal และจัดการสถานะด้วย Redux
+
+-   **ติดตั้ง Library:** ติดตั้ง `react-modal` และ `@types/react-modal` เพื่อสร้าง Modal
+
+-   **สร้าง Modal พื้นฐาน:** สร้าง `Modal.tsx` ที่เป็น Generic component สำหรับการแสดงผล Modal และ `ModalBody` สำหรับเนื้อหา
+
+-   **สร้าง Modal เฉพาะทาง:** สร้าง `AddAndEditBoardModal.tsx` เพื่อใช้สำหรับเพิ่มและแก้ไขบอร์ดโดยเฉพาะ
+
+-   **จัดการสถานะด้วย Redux:** อัปเดต `appSlice.ts` ให้มี state สำหรับควบคุมการเปิด-ปิด (`isOpen`) และประเภท (`variant`) ของ Modal พร้อมสร้าง actions (`open/close...`) และ selectors
+
+-   **เชื่อมต่อ Triggers:** อัปเดตปุ่มต่างๆ ใน `Sidebar`, `Dropdown`, และ `BoardTasks` ให้ `dispatch` action `openAddAndEditBoardModal` เพื่อเปิด Modal ตามบริบทที่ต้องการ
+
+**สถานะปัจจุบัน:** โครงสร้างสำหรับ UI ของการ **Create** และ **Update** (Modal) ได้ถูกสร้างและเชื่อมต่อกับ Redux State เรียบร้อยแล้ว ขั้นตอนต่อไปคือการสร้างฟอร์มและ Logic ภายใน Modal เพื่อจัดการข้อมูลบอร์ดและคอลัมน์
+
+11. การเตรียม Logic ภายใน Modal
+
+    เตรียม AddAndEditBoardModal.tsx:
+
+        เพิ่มการ imports ที่จำเป็นทั้งหมด เช่น useState, useEffect, hooks จาก Redux และ RTK Query
+
+        กำหนด interface สำหรับ Type ของข้อมูลบอร์ด (IBoardData)
+
+        สร้างข้อมูลจำลอง (addBoardData) เพื่อใช้เป็นแม่แบบสำหรับสร้างบอร์ดใหม่
+
+        ประกาศ State และ Hooks ที่จำเป็นภายในคอมโพเนนต์ เช่น boardData, modalVariant, useUpdateBoardToDbMutation เพื่อเตรียมพร้อมสำหรับ Logic ในการจัดการฟอร์ม
+
+สถานะปัจจุบัน: โครงสร้างและ Logic พื้นฐานภายใน Modal สำหรับการเพิ่ม/แก้ไขบอร์ดได้ถูกจัดเตรียมไว้เรียบร้อยแล้ว ขั้นตอนถัดไปคือการสร้าง UI ของฟอร์มและฟังก์ชันการทำงานเพื่อจัดการข้อมูลที่ผู้ใช้กรอก

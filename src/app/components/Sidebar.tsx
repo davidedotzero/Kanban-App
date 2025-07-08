@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAppDispatch } from "@/redux/hooks";
 import { useFetchDataFromDbQuery } from "@/redux/services/apiSlice";
 import { setPageTitle } from "@/redux/features/appSlice";
+import { openAddAndEditBoardModal } from "@/redux/features/appSlice";
 
 export default function Sidebar() {
   const [active, setActive] = useState<number>(0);
@@ -50,7 +51,9 @@ export default function Sidebar() {
           )}
         </>
       )}
-      <button className="flex items-center space-x-2 pl-[2.12rem] py-3">
+      <button 
+      onClick={() => dispatch(openAddAndEditBoardModal("Add New"))}
+      className="flex items-center space-x-2 pl-[2.12rem] py-3">
         <p className="text-base font-bold capitalize text-main-purple">
           + Create New Board
         </p>
