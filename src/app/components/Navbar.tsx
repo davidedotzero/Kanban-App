@@ -4,7 +4,7 @@
 import Dropdown from "./Dropdown"
 import { useState, useEffect } from "react"
 
-import { setPageTitle, getPageTitle } from "@/redux/features/appSlice"
+import { setCurrentBoardName, getCurrentBoardName } from "@/redux/features/appSlice"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 
 import { useFetchDataFromDbQuery } from "@/redux/services/apiSlice"
@@ -25,13 +25,13 @@ export default function Navbar() {
             if (firstItem && firstItem.boards) {
               if (Array.isArray(firstItem.boards) && firstItem.boards.length > 0) {
                   const activeBoard = firstItem.boards[0];
-                  dispatch(setPageTitle(activeBoard.name));
+                  dispatch(setCurrentBoardName(activeBoard.name));
               }
             }
         }
     }, [data, dispatch])
 
-    const currentBoardName = useAppSelector(getPageTitle);
+    const currentBoardName = useAppSelector(getCurrentBoardName);
     
 
   return (

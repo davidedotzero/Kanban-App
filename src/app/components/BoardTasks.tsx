@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useFetchDataFromDbQuery } from "@/redux/services/apiSlice";
 import { useAppSelector } from "@/redux/hooks";
-import { getPageTitle } from "@/redux/features/appSlice";
+import { getCurrentBoardName } from "@/redux/features/appSlice";
 import { MdEdit, MdDelete } from "react-icons/md";
 
 import { openAddAndEditBoardModal } from '@/redux/features/appSlice';
@@ -25,7 +25,7 @@ interface Column {
 export default function BoardTasks() {
   const { isLoading, data } = useFetchDataFromDbQuery();
   const [columns, setColumns] = useState<Column[]>([]);
-  const currentBoardName = useAppSelector(getPageTitle);
+  const currentBoardName = useAppSelector(getCurrentBoardName);
   const dispatch = useAppDispatch();
 
   useEffect(() => {

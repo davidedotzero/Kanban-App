@@ -16,7 +16,7 @@ export const features = createSlice({
   // ฟังก์ชันที่อัปเดต initialState จะถูกเขียนไว้ในอ็อบเจกต์ reducers
   reducers: {
     // ฟังก์ชันนี้จะอัปเดตชื่อบอร์ดเมื่อถูกเรียกใช้
-    setPageTitle: (state, action: PayloadAction<string>) => {
+    setCurrentBoardName: (state, action: PayloadAction<string>) => {
       state.currentBoardName = action.payload;
     },
     // ฟังก์ชันนี้จะเปิดหรือปิด modal สำหรับการเพิ่มและแก้ไขบอร์ด
@@ -36,13 +36,13 @@ export const features = createSlice({
 });
 
 export const {
-  setPageTitle,
+  setCurrentBoardName,
   openAddAndEditBoardModal,
   closeAddAndEditBoardModal,
 } = features.actions;
 
 // ฟังก์ชัน Selector สำหรับดึงชื่อบอร์ดปัจจุบันออกจาก state
-export const getPageTitle = (state: RootState) => 
+export const getCurrentBoardName = (state: RootState) => 
   state.features.currentBoardName;
 
 export const getAddAndEditBoardModalValue = (state: RootState) => 
